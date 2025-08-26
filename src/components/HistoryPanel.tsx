@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { formatDistanceToNow } from 'date-fns';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { GenerationResponse } from '../lib/api';
@@ -8,9 +8,9 @@ interface HistoryPanelProps {
   onSelect: (item: GenerationResponse) => void;
 }
 
-export const HistoryPanel: React.FC<HistoryPanelProps> = ({ history, onSelect }) => {
+const HistoryPanelComponent: React.FC<HistoryPanelProps> = ({ history, onSelect }) => {
   return (
-    <div className="bg-brand-surface p-4 rounded-lg h-full">
+    <div className="bg-brand-surface p-4 rounded-lg">
       <h2 className="text-xl font-bold mb-4">History</h2>
       {history.length === 0 ? (
         <p className="text-brand-muted">Your last 5 generations will appear here.</p>
@@ -25,7 +25,7 @@ export const HistoryPanel: React.FC<HistoryPanelProps> = ({ history, onSelect })
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, transition: { duration: 0.2 } }}
               >
-                <button onClick={() => onSelect(item)} className="w-full text-left p-3 rounded-lg bg-brand-dark hover:bg-opacity-80 transition-colors flex items-center space-x-4">
+                <button onClick={() => onSelect(item)} className="w-full text-left p-3 rounded-lg bg-brand-dark hover:bg-opacity-80 transition-colors flex items-center space-x-4 focus:outline-none focus:ring-2 focus:ring-brand-primary">
                   <img src={item.imageUrl} alt={item.prompt} className="w-16 h-16 object-cover rounded-md flex-shrink-0" />
                   <div className="overflow-hidden">
                     <p className="font-semibold truncate text-white">{item.prompt}</p>
@@ -41,3 +41,5 @@ export const HistoryPanel: React.FC<HistoryPanelProps> = ({ history, onSelect })
     </div>
   );
 };
+
+export const HistoryPanel = memo(HistoryPanelComponent);

@@ -25,18 +25,16 @@ function App() {
     localStorage.setItem('aiStudioHistory', JSON.stringify(history));
   }, [history]);
 
-  const handleHistorySelect = (item: GenerationResponse) => {
+  const handleHistorySelect = useCallback((item: GenerationResponse) => {
     toast.success("Loaded from history!");
     setImageDataUrl(item.imageUrl);
     setPrompt(item.prompt);
     setStyle(item.style);
-  };
+  }, []); // Empty dependency array ensures this function is created only once
 
   const handleAbort = () => {
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
-      toast.error('Generation aborted!');
-      setIsLoading(false);
     }
   };
 
@@ -60,7 +58,6 @@ function App() {
         try {
           if (signal.aborted) return reject(new DOMException('Aborted', 'AbortError'));
           
-          // Show retry toast on subsequent attempts
           if(attempt > 1) {
             toast.loading(`Model overloaded. Retrying... (${attempt}/${MAX_RETRIES})`, { id: 'generation-toast' });
           }
@@ -85,7 +82,7 @@ function App() {
           setHistory(prev => [result, ...prev].slice(0, 5));
           return 'Generation complete!';
         },
-        error: 'Generation failed. Please try again.',
+        error: (err) => err.name === 'AbortError' ? 'Generation aborted!' : 'Generation failed. Please try again.',
       },
       { id: 'generation-toast' }
     );
